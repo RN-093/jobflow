@@ -1,6 +1,19 @@
-import { BarChart3, Calendar, Kanban, LayoutDashboard, Settings, Table2, X } from "lucide-react";
-import { NavLink } from "react-router-dom";
+import type { ReactNode } from "react";
+import {
+  BarChart3,
+  Calendar,
+  ChevronsLeft,
+  ChevronsRight,
+  Kanban,
+  LayoutDashboard,
+  LogOut,
+  Settings,
+  Table2,
+  X,
+} from "lucide-react";
+import { NavLink, useNavigate } from "react-router-dom";
 
+import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/cn";
 
 const NAV_ITEMS = [
@@ -15,40 +28,92 @@ const NAV_ITEMS = [
 interface SidebarProps {
   mobileOpen: boolean;
   onCloseMobile: () => void;
+  collapsed: boolean;
+  onToggleCollapsed: () => void;
 }
 
-export function Sidebar({ mobileOpen, onCloseMobile }: SidebarProps) {
-  const content = (
-    <nav className="flex h-full flex-col gap-1 p-3">
-      <div className="mb-4 flex items-center gap-2 px-2 py-2">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent text-sm font-bold text-white">
-          JF
+export function Sidebar({ mobileOpen, onCloseMobile, collapsed, onToggleCollapsed }: SidebarProps) {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  function handleLogout(): void {
+    logout();
+    navigate("/login");
+  }
+
+  function renderContent(isCollapsed: boolean, options: { showCollapseToggle: boolean }): ReactNode {
+    return (
+      <nav className="flex h-full flex-col gap-1 p-3">
+        <div className={cn("mb-4 flex items-center gap-2 px-2 py-2", isCollapsed && "justify-center px-0")}>
+          <div
+            data-app-logo
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent text-sm font-bold text-white"
+          >
+            JF
+          </div>
+          {!isCollapsed && <span className="text-lg font-semibold text-text">JobFlow</span>}
         </div>
-        <span className="text-lg font-semibold text-text lg:inline">JobFlow</span>
-      </div>
-      {NAV_ITEMS.map(({ to, label, icon: Icon }) => (
-        <NavLink
-          key={to}
-          to={to}
-          onClick={onCloseMobile}
-          className={({ isActive }) =>
-            cn(
-              "flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-colors",
-              isActive ? "bg-accent/10 text-accent" : "text-muted hover:bg-surface-hover hover:text-text"
-            )
-          }
-        >
-          <Icon size={18} className="shrink-0" />
-          <span className="lg:inline">{label}</span>
-        </NavLink>
-      ))}
-    </nav>
-  );
+
+        {NAV_ITEMS.map(({ to, label, icon: Icon }) => (
+          <NavLink
+            key={to}
+            to={to}
+            onClick={onCloseMobile}
+            title={isCollapsed ? label : undefined}
+            className={({ isActive }) =>
+              cn(
+                "flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-colors",
+                isCollapsed && "justify-center px-0",
+                isActive ? "bg-accent/10 text-accent" : "text-muted hover:bg-surface-hover hover:text-text"
+              )
+            }
+          >
+            <Icon size={18} className="shrink-0" />
+            {!isCollapsed && <span>{label}</span>}
+          </NavLink>
+        ))}
+
+        <div className="mt-auto flex flex-col gap-1 border-t border-border pt-2">
+          {options.showCollapseToggle && (
+            <button
+              type="button"
+              onClick={onToggleCollapsed}
+              title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+              className={cn(
+                "flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-surface-hover hover:text-text",
+                isCollapsed && "justify-center px-0"
+              )}
+            >
+              {isCollapsed ? <ChevronsRight size={18} className="shrink-0" /> : <ChevronsLeft size={18} className="shrink-0" />}
+              {!isCollapsed && <span>Collapse</span>}
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={handleLogout}
+            title={isCollapsed ? "Log out" : undefined}
+            className={cn(
+              "flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-danger/10 hover:text-danger",
+              isCollapsed && "justify-center px-0"
+            )}
+          >
+            <LogOut size={18} className="shrink-0" />
+            {!isCollapsed && <span>Log out</span>}
+          </button>
+        </div>
+      </nav>
+    );
+  }
 
   return (
     <>
-      <aside className="hidden shrink-0 border-r border-border bg-surface md:flex md:w-56 lg:w-60">
-        {content}
+      <aside
+        className={cn(
+          "hidden shrink-0 border-r border-border bg-surface transition-[width] duration-200 md:flex",
+          collapsed ? "md:w-16" : "md:w-56 lg:w-60"
+        )}
+      >
+        {renderContent(collapsed, { showCollapseToggle: true })}
       </aside>
 
       {mobileOpen && (
@@ -63,7 +128,7 @@ export function Sidebar({ mobileOpen, onCloseMobile }: SidebarProps) {
             >
               <X size={18} />
             </button>
-            {content}
+            {renderContent(false, { showCollapseToggle: false })}
           </aside>
         </div>
       )}

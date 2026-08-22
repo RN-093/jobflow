@@ -6,19 +6,21 @@ import { cn } from "@/lib/cn";
 import type { JobDetail, Stage } from "@/types";
 
 interface KanbanColumnProps {
-  stage: Stage;
+  id: string;
+  title: string;
   jobs: JobDetail[];
+  stages: Stage[];
   onQuickView: (job: JobDetail) => void;
+  onMoveStage: (jobId: string, toStageId: string) => void;
 }
 
-export function KanbanColumn({ stage, jobs, onQuickView }: KanbanColumnProps) {
-  const { setNodeRef, isOver } = useDroppable({ id: stage.id });
+export function KanbanColumn({ id, title, jobs, stages, onQuickView, onMoveStage }: KanbanColumnProps) {
+  const { setNodeRef, isOver } = useDroppable({ id });
 
   return (
     <div className="flex w-72 shrink-0 flex-col rounded-xl bg-surface/60">
       <div className="flex items-center gap-2 px-3 py-2">
-        <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: stage.color }} />
-        <h3 className="truncate text-sm font-semibold text-text">{stage.name}</h3>
+        <h3 className="truncate text-sm font-semibold text-text">{title}</h3>
         <span className="ml-auto shrink-0 rounded-full bg-surface-hover px-2 py-0.5 text-xs text-muted">
           {jobs.length}
         </span>
@@ -32,7 +34,7 @@ export function KanbanColumn({ stage, jobs, onQuickView }: KanbanColumnProps) {
       >
         <SortableContext items={jobs.map((j) => j.id)} strategy={verticalListSortingStrategy}>
           {jobs.map((job) => (
-            <JobCard key={job.id} job={job} onQuickView={onQuickView} />
+            <JobCard key={job.id} job={job} stages={stages} onQuickView={onQuickView} onMoveStage={onMoveStage} />
           ))}
         </SortableContext>
       </div>

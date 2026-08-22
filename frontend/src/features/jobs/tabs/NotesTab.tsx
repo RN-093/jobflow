@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import * as childrenApi from "@/api/children";
 import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -62,7 +63,7 @@ export function NotesTab({ jobId }: NotesTabProps) {
       ) : (
         <div className="space-y-3">
           {data.map((note) => (
-            <div key={note.id} className="rounded-xl border border-border bg-surface p-4">
+            <Card key={note.id}>
               <p className="whitespace-pre-wrap text-sm text-text">{note.body}</p>
               <div className="mt-2 flex items-center justify-between">
                 <p className="text-xs text-muted">{formatDateTime(note.created_at)}</p>
@@ -70,7 +71,7 @@ export function NotesTab({ jobId }: NotesTabProps) {
                   Remove
                 </Button>
               </div>
-            </div>
+            </Card>
           ))}
         </div>
       )}

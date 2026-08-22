@@ -1,3 +1,4 @@
+import { Card } from "@/components/ui/Card";
 import type { DashboardMetrics } from "@/types";
 
 interface MetricsGridProps {
@@ -27,10 +28,10 @@ export function MetricsGrid({ metrics }: MetricsGridProps) {
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
       {items.map((item) => (
-        <div key={item.label} className="rounded-xl border border-border bg-surface p-4 shadow-sm">
+        <Card key={item.label} interactive>
           <p className="text-lg font-semibold text-text">{item.value}</p>
           <p className="text-xs text-muted">{item.label}</p>
-        </div>
+        </Card>
       ))}
     </div>
   );

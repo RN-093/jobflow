@@ -5,6 +5,7 @@ import { MemoryRouter } from "react-router-dom";
 
 import { ToastProvider } from "@/components/ui/Toast";
 import { AuthProvider } from "@/hooks/useAuth";
+import { LoginTransitionProvider } from "@/hooks/useLoginTransition";
 
 export function renderWithProviders(ui: ReactElement, { route = "/" }: { route?: string } = {}) {
   const queryClient = new QueryClient({
@@ -16,7 +17,9 @@ export function renderWithProviders(ui: ReactElement, { route = "/" }: { route?:
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <ToastProvider>
-            <MemoryRouter initialEntries={[route]}>{children}</MemoryRouter>
+            <LoginTransitionProvider>
+              <MemoryRouter initialEntries={[route]}>{children}</MemoryRouter>
+            </LoginTransitionProvider>
           </ToastProvider>
         </AuthProvider>
       </QueryClientProvider>

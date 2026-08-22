@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import * as childrenApi from "@/api/children";
 import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { Input } from "@/components/ui/Input";
@@ -85,7 +86,7 @@ export function TasksTab({ jobId }: TasksTabProps) {
       ) : (
         <div className="space-y-2">
           {data.map((task) => (
-            <div key={task.id} className="flex items-center gap-3 rounded-xl border border-border bg-surface p-3">
+            <Card key={task.id} padding="sm" className="flex items-center gap-3">
               <input
                 type="checkbox"
                 checked={task.completed}
@@ -99,7 +100,7 @@ export function TasksTab({ jobId }: TasksTabProps) {
               <Button size="sm" variant="ghost" onClick={() => remove.mutate(task.id)}>
                 Remove
               </Button>
-            </div>
+            </Card>
           ))}
         </div>
       )}

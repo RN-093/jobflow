@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as childrenApi from "@/api/children";
 import * as pipelineApi from "@/api/pipeline";
 import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { Input } from "@/components/ui/Input";
@@ -90,7 +91,7 @@ export function InterviewsTab({ jobId }: InterviewsTabProps) {
       ) : (
         <div className="space-y-3">
           {data.map((interview) => (
-            <div key={interview.id} className="rounded-xl border border-border bg-surface p-4">
+            <Card key={interview.id}>
               <div className="flex items-start justify-between">
                 <div>
                   <p className="font-medium text-text">{interview.type_label}</p>
@@ -132,7 +133,7 @@ export function InterviewsTab({ jobId }: InterviewsTabProps) {
                   </Button>
                 </div>
               )}
-            </div>
+            </Card>
           ))}
         </div>
       )}

@@ -5,9 +5,11 @@ import { ApiError } from "@/api/client";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { useAuth } from "@/hooks/useAuth";
+import { useLoginTransition } from "@/hooks/useLoginTransition";
 
 export default function LoginPage() {
   const { login } = useAuth();
+  const { play } = useLoginTransition();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -20,6 +22,7 @@ export default function LoginPage() {
     setSubmitting(true);
     try {
       await login(email, password);
+      play();
       navigate("/dashboard");
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Failed to log in");

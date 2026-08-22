@@ -3,14 +3,18 @@ import { CSS } from "@dnd-kit/utilities";
 import { AlertCircle, CalendarClock, Eye, Flag } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
+import { StageBadge } from "@/components/kanban/StageBadge";
+import { Card } from "@/components/ui/Card";
 import { cn } from "@/lib/cn";
 import { activityDotColor, formatDate, isOverdue } from "@/lib/dates";
 import { formatSalaryRange } from "@/lib/money";
-import type { JobDetail } from "@/types";
+import type { JobDetail, Stage } from "@/types";
 
 interface JobCardProps {
   job: JobDetail;
+  stages: Stage[];
   onQuickView: (job: JobDetail) => void;
+  onMoveStage: (jobId: string, toStageId: string) => void;
 }
 
 const DOT_COLOR_CLASSES: Record<string, string> = {
@@ -19,7 +23,7 @@ const DOT_COLOR_CLASSES: Record<string, string> = {
   red: "bg-danger",
 };
 
-export function JobCard({ job, onQuickView }: JobCardProps) {
+export function JobCard({ job, stages, onQuickView, onMoveStage }: JobCardProps) {
   const navigate = useNavigate();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: job.id });
 
@@ -34,18 +38,17 @@ export function JobCard({ job, onQuickView }: JobCardProps) {
   const dot = activityDotColor(job.last_activity_at);
 
   return (
-    <div
+    <Card
       ref={setNodeRef}
       style={style}
       {...attributes}
       {...listeners}
+      interactive
+      padding="sm"
       onClick={() => navigate(`/jobs/${job.id}`)}
       data-testid="job-card"
       data-job-id={job.id}
-      className={cn(
-        "group relative cursor-pointer touch-none rounded-xl border border-border bg-surface p-3 shadow-sm transition-shadow hover:shadow-md",
-        isDragging && "opacity-50"
-      )}
+      className={cn("group relative cursor-pointer touch-none", isDragging && "opacity-50")}
     >
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
@@ -56,6 +59,10 @@ export function JobCard({ job, onQuickView }: JobCardProps) {
           className={cn("mt-1 h-2 w-2 shrink-0 rounded-full", DOT_COLOR_CLASSES[dot])}
           title="Days since last activity"
         />
+      </div>
+
+      <div className="mt-2">
+        <StageBadge job={job} stages={stages} onMove={(toStageId) => onMoveStage(job.id, toStageId)} />
       </div>
 
       {salary && <p className="mt-2 text-xs font-medium text-text">{salary}</p>}
@@ -92,6 +99,6 @@ export function JobCard({ job, onQuickView }: JobCardProps) {
       >
         <Eye size={14} />
       </button>
-    </div>
+    </Card>
   );
 }

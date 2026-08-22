@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import * as childrenApi from "@/api/children";
 import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { Input } from "@/components/ui/Input";
@@ -63,10 +64,7 @@ export function ContactsTab({ jobId }: ContactsTabProps) {
       ) : (
         <div className="space-y-3">
           {data.map((contact) => (
-            <div
-              key={contact.id}
-              className="flex items-start justify-between rounded-xl border border-border bg-surface p-4"
-            >
+            <Card key={contact.id} className="flex items-start justify-between">
               <div>
                 <p className="font-medium text-text">{contact.name}</p>
                 {contact.job_title && <p className="text-sm text-muted">{contact.job_title}</p>}
@@ -76,7 +74,7 @@ export function ContactsTab({ jobId }: ContactsTabProps) {
               <Button size="sm" variant="ghost" onClick={() => remove.mutate(contact.id)}>
                 Remove
               </Button>
-            </div>
+            </Card>
           ))}
         </div>
       )}

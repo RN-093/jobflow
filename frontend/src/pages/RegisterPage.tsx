@@ -5,9 +5,11 @@ import { ApiError } from "@/api/client";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { useAuth } from "@/hooks/useAuth";
+import { useLoginTransition } from "@/hooks/useLoginTransition";
 
 export default function RegisterPage() {
   const { register } = useAuth();
+  const { play } = useLoginTransition();
   const navigate = useNavigate();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -21,6 +23,7 @@ export default function RegisterPage() {
     setSubmitting(true);
     try {
       await register(email, password, fullName || undefined);
+      play();
       navigate("/dashboard");
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Failed to create account");

@@ -1,12 +1,15 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import * as jobsApi from "@/api/jobs";
 import type { JobFilters } from "@/api/jobs";
+import * as pipelineApi from "@/api/pipeline";
+import { StageBadge } from "@/components/kanban/StageBadge";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { useToast } from "@/components/ui/Toast";
 import { formatDate } from "@/lib/dates";
 import { formatSalaryRange } from "@/lib/money";
 
@@ -33,9 +36,23 @@ const COLUMNS: { key: SortKey | null; label: string }[] = [
 
 export function JobsTable({ filters, sort, order, onSortChange }: JobsTableProps) {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["jobs", JSON.stringify({ ...filters, sort, order })],
     queryFn: () => jobsApi.listJobs({ ...filters, sort, order, page_size: 100 }),
+  });
+  const { data: stages } = useQuery({ queryKey: ["stages"], queryFn: pipelineApi.listStages });
+
+  const moveStage = useMutation({
+    mutationFn: ({ jobId, toStageId }: { jobId: string; toStageId: string }) =>
+      jobsApi.moveJobStage(jobId, { stage_id: toStageId }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["jobs"] });
+      queryClient.invalidateQueries({ queryKey: ["board"] });
+      toast("Stage updated");
+    },
+    onError: () => toast("Failed to update stage", "error"),
   });
 
   if (isLoading) return <Skeleton className="h-96 w-full" />;
@@ -75,9 +92,18 @@ export function JobsTable({ filters, sort, order, onSortChange }: JobsTableProps
               <td className="whitespace-nowrap px-3 py-2 font-medium text-text">{job.company}</td>
               <td className="max-w-[220px] truncate px-3 py-2 text-text">{job.title}</td>
               <td className="whitespace-nowrap px-3 py-2">
-                <span className="rounded-full bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent">
-                  {job.stage_name}
-                </span>
+                {stages ? (
+                  <StageBadge
+                    job={job}
+                    stages={stages}
+                    disabled={moveStage.isPending}
+                    onMove={(toStageId) => moveStage.mutate({ jobId: job.id, toStageId })}
+                  />
+                ) : (
+                  <span className="rounded-full bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent">
+                    {job.stage_name}
+                  </span>
+                )}
               </td>
               <td className="whitespace-nowrap px-3 py-2 text-muted">{formatDate(job.date_sourced)}</td>
               <td className="whitespace-nowrap px-3 py-2 text-muted">{formatDate(job.date_applied)}</td>

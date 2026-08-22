@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 
+import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { formatDate, formatDateTime } from "@/lib/dates";
 import type { DashboardResponse } from "@/types";
@@ -67,10 +68,10 @@ export function UpcomingPanel({ upcoming }: UpcomingPanelProps) {
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className="rounded-xl border border-border bg-surface p-4 shadow-sm">
+    <Card>
       <h3 className="mb-2 text-sm font-semibold text-text">{title}</h3>
       <div className="space-y-2">{children}</div>
-    </div>
+    </Card>
   );
 }
 

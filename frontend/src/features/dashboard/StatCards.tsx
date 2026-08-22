@@ -1,3 +1,4 @@
+import { Card } from "@/components/ui/Card";
 import type { DashboardStats } from "@/types";
 
 interface StatCardsProps {
@@ -18,10 +19,10 @@ export function StatCards({ stats }: StatCardsProps) {
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
       {CARDS.map(({ key, label }) => (
-        <div key={key} className="rounded-xl border border-border bg-surface p-4 shadow-sm">
+        <Card key={key} interactive>
           <p className="text-2xl font-semibold text-text">{stats[key]}</p>
           <p className="text-xs text-muted">{label}</p>
-        </div>
+        </Card>
       ))}
     </div>
   );

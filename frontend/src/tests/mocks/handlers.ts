@@ -33,6 +33,26 @@ export const STAGES: Stage[] = [
     created_at: "2026-01-01T00:00:00",
     job_count: 0,
   },
+  {
+    id: "stage-offer",
+    name: "Offer",
+    position: 8,
+    color: "#10b981",
+    stage_type: "offer",
+    is_default: true,
+    created_at: "2026-01-01T00:00:00",
+    job_count: 0,
+  },
+  {
+    id: "stage-rejected",
+    name: "Rejected",
+    position: 9,
+    color: "#ef4444",
+    stage_type: "rejected",
+    is_default: true,
+    created_at: "2026-01-01T00:00:00",
+    job_count: 0,
+  },
 ];
 
 function makeJob(overrides: Partial<JobDetail> = {}): JobDetail {

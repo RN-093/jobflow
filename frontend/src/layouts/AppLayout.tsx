@@ -7,6 +7,7 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { Topbar } from "@/components/layout/Topbar";
 import { NewJobModal } from "@/features/jobs/NewJobModal";
 import { useHotkeys } from "@/hooks/useHotkeys";
+import { useSidebarCollapsed } from "@/hooks/useSidebarCollapsed";
 
 interface NewJobModalContextValue {
   open: () => void;
@@ -26,6 +27,7 @@ export function AppLayout() {
   const [newJobOpen, setNewJobOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
+  const { collapsed, toggle: toggleCollapsed } = useSidebarCollapsed();
 
   useHotkeys({
     n: () => setNewJobOpen(true),
@@ -57,7 +59,12 @@ export function AppLayout() {
   return (
     <NewJobModalContext.Provider value={{ open: () => setNewJobOpen(true) }}>
       <div className="flex h-screen overflow-hidden bg-bg">
-        <Sidebar mobileOpen={sidebarOpen} onCloseMobile={() => setSidebarOpen(false)} />
+        <Sidebar
+          mobileOpen={sidebarOpen}
+          onCloseMobile={() => setSidebarOpen(false)}
+          collapsed={collapsed}
+          onToggleCollapsed={toggleCollapsed}
+        />
         <div className="flex min-w-0 flex-1 flex-col">
           <Topbar
             onOpenSidebar={() => setSidebarOpen(true)}

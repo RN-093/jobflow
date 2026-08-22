@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   DndContext,
   KeyboardSensor,
@@ -20,6 +20,7 @@ import { ErrorState } from "@/components/ui/ErrorState";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useToast } from "@/components/ui/Toast";
 import { useBoardData, useMoveJob } from "@/hooks/useBoard";
+import { BUCKET_LABELS, BUCKET_ORDER, bucketOf, defaultStageForBucket, groupStagesByBucket, type BucketId } from "@/lib/buckets";
 import type { JobDetail, Stage } from "@/types";
 
 interface KanbanBoardProps {
@@ -40,6 +41,10 @@ function findColumnOf(jobId: string, source: ColumnMap): string | undefined {
   return undefined;
 }
 
+function isBucketId(value: string): value is BucketId {
+  return (BUCKET_ORDER as string[]).includes(value);
+}
+
 export function KanbanBoard({ stages, filters = {} }: KanbanBoardProps) {
   const { data, columns, isLoading, isError, refetch } = useBoardData(filters);
   const { toast } = useToast();
@@ -49,6 +54,32 @@ export function KanbanBoard({ stages, filters = {} }: KanbanBoardProps) {
   const [quickViewJob, setQuickViewJob] = useState<JobDetail | null>(null);
 
   const activeColumns = previewColumns ?? columns;
+
+  const stageById = useMemo(() => new Map(stages.map((s) => [s.id, s])), [stages]);
+  const bucketsMap = useMemo(() => groupStagesByBucket(stages), [stages]);
+
+  function jobsForBucket(bucket: BucketId): JobDetail[] {
+    const memberStages = bucketsMap.get(bucket) ?? [];
+    const combined: JobDetail[] = [];
+    for (const stage of memberStages) {
+      combined.push(...(activeColumns.get(stage.id) ?? []));
+    }
+    return combined.sort((a, b) => {
+      const posA = stageById.get(a.stage_id)?.position ?? 0;
+      const posB = stageById.get(b.stage_id)?.position ?? 0;
+      return posA - posB || a.position - b.position;
+    });
+  }
+
+  function bucketOfStageId(stageId: string | undefined): BucketId | undefined {
+    const stage = stageId ? stageById.get(stageId) : undefined;
+    return stage ? bucketOf(stage) : undefined;
+  }
+
+  function resolveTargetBucket(overId: string, source: ColumnMap): BucketId | undefined {
+    if (isBucketId(overId)) return overId;
+    return bucketOfStageId(findColumnOf(overId, source));
+  }
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
@@ -69,10 +100,14 @@ export function KanbanBoard({ stages, filters = {} }: KanbanBoardProps) {
       const overId = String(over.id);
 
       const fromStageId = findColumnOf(activeId, prev);
-      if (!fromStageId) return prev;
+      const fromBucket = bucketOfStageId(fromStageId);
+      if (!fromStageId || !fromBucket) return prev;
 
-      const overStageId = stages.some((s) => s.id === overId) ? overId : findColumnOf(overId, prev);
-      if (!overStageId || fromStageId === overStageId) return prev;
+      const toBucket = resolveTargetBucket(overId, prev);
+      if (!toBucket || toBucket === fromBucket) return prev;
+
+      const targetStage = defaultStageForBucket(bucketsMap.get(toBucket) ?? []);
+      if (!targetStage) return prev;
 
       const next = cloneColumns(prev);
       const fromJobs = next.get(fromStageId) ?? [];
@@ -80,13 +115,11 @@ export function KanbanBoard({ stages, filters = {} }: KanbanBoardProps) {
       if (jobIndex === -1) return prev;
       const [job] = fromJobs.splice(jobIndex, 1);
 
-      const toJobs = next.get(overStageId) ?? [];
-      const overIndex = toJobs.findIndex((j) => j.id === overId);
-      const insertAt = overIndex === -1 ? toJobs.length : overIndex;
-      toJobs.splice(insertAt, 0, job);
+      const toJobs = next.get(targetStage.id) ?? [];
+      toJobs.push(job);
 
       next.set(fromStageId, fromJobs);
-      next.set(overStageId, toJobs);
+      next.set(targetStage.id, toJobs);
       return next;
     });
   }
@@ -102,31 +135,41 @@ export function KanbanBoard({ stages, filters = {} }: KanbanBoardProps) {
     const overId = String(over.id);
 
     const originalStageId = findColumnOf(activeId, columns);
-    const toStageId = stages.some((s) => s.id === overId) ? overId : findColumnOf(overId, snapshot);
+    const fromBucket = bucketOfStageId(originalStageId);
+    if (!originalStageId || !fromBucket) return;
 
-    if (!originalStageId || !toStageId) return;
-
-    const finalColumnJobs = snapshot.get(toStageId) ?? [];
-    const toIndex = finalColumnJobs.findIndex((j) => j.id === activeId);
-    const originalIndex = columns.get(originalStageId)?.findIndex((j) => j.id === activeId) ?? -1;
-
-    if (originalStageId === toStageId && toIndex === originalIndex) {
+    const toBucket = resolveTargetBucket(overId, snapshot);
+    if (!toBucket || toBucket === fromBucket) {
+      // Same-bucket drop is a no-op — sub-stage changes go through the StageBadge dropdown,
+      // since a merged bucket has no single coherent position ordering to reorder within.
       return;
     }
+
+    const targetStage = defaultStageForBucket(bucketsMap.get(toBucket) ?? []);
+    if (!targetStage) return;
+
+    const finalColumnJobs = snapshot.get(targetStage.id) ?? [];
+    const toIndex = finalColumnJobs.findIndex((j) => j.id === activeId);
 
     moveJob.mutate({
       jobId: activeId,
       fromStageId: originalStageId,
-      toStageId,
+      toStageId: targetStage.id,
       toIndex: toIndex === -1 ? 0 : toIndex,
     });
+  }
+
+  function handleMoveStage(jobId: string, toStageId: string): void {
+    const fromStageId = findColumnOf(jobId, columns);
+    if (!fromStageId || fromStageId === toStageId) return;
+    moveJob.mutate({ jobId, fromStageId, toStageId, toIndex: 0 });
   }
 
   if (isLoading) {
     return (
       <div className="flex h-full gap-4 overflow-x-auto pb-4">
-        {stages.map((stage) => (
-          <div key={stage.id} className="w-72 shrink-0 space-y-2">
+        {BUCKET_ORDER.map((bucket) => (
+          <div key={bucket} className="w-72 shrink-0 space-y-2">
             <Skeleton className="h-8" />
             <Skeleton className="h-24" />
             <Skeleton className="h-24" />
@@ -158,12 +201,15 @@ export function KanbanBoard({ stages, filters = {} }: KanbanBoardProps) {
       onDragEnd={handleDragEnd}
     >
       <div className="flex h-full gap-4 overflow-x-auto pb-4">
-        {stages.map((stage) => (
+        {BUCKET_ORDER.map((bucket) => (
           <KanbanColumn
-            key={stage.id}
-            stage={stage}
-            jobs={activeColumns.get(stage.id) ?? []}
+            key={bucket}
+            id={bucket}
+            title={BUCKET_LABELS[bucket]}
+            jobs={jobsForBucket(bucket)}
+            stages={stages}
             onQuickView={setQuickViewJob}
+            onMoveStage={handleMoveStage}
           />
         ))}
       </div>
