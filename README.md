@@ -1,12 +1,12 @@
 # JobFlow
 
-A personal job-application tracker. It's based on a similar thing from Jack & Jill but there one had a few issues so just made my own one. 
+A personal job-application tracker. It's based on a similar thing from Jack & Jill but there one had a few issues + quite buggy in my experience, so I just made my own one. 
 
 ## Live
 
 Have a go: https://jobflow-two-phi.vercel.app
 
-Make your own account, it takes about ten seconds.
+Make your own account, it takes about ten seconds. Always free. 
 
 ## Stack
 
