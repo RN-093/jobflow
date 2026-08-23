@@ -13,9 +13,13 @@ export function useLoginTransition(): LoginTransitionContextValue {
 }
 
 // Sizes/position mirror the real logo marks: AuthLayout's centered h-10 w-10 block growing
-// to cover the screen, then settling into Sidebar's h-8 w-8 block near the top-left. These are
-// fixed approximations, not measured via getBoundingClientRect — intentionally simple/robust.
+// into a large centered logo mark, then settling into Sidebar's h-8 w-8 block near the top-left.
+// HERO_SIZE is capped well below viewport size on purpose — scaling the mark up to literally
+// cover the screen makes the "JF" letters bigger than the viewport itself, so it just reads as
+// a plain colour fill rather than a logo. These are fixed approximations, not measured via
+// getBoundingClientRect — intentionally simple/robust.
 const LOGO_SIZE = 40;
+const HERO_SIZE = 220;
 const TARGET_SIZE = 32;
 const TARGET_X = 28;
 const TARGET_Y = 28;
@@ -62,11 +66,12 @@ function LoginTransitionOverlay({ phase }: { phase: Phase }) {
   const vh = typeof window !== "undefined" ? window.innerHeight : 800;
   const centerX = vw / 2 - LOGO_SIZE / 2;
   const centerY = vh / 2 - LOGO_SIZE / 2;
-  const coverScale = (Math.max(vw, vh) * 1.6) / LOGO_SIZE;
+  const heroX = vw / 2 - HERO_SIZE / 2;
+  const heroY = vh / 2 - HERO_SIZE / 2;
 
   const transforms: Record<Phase, string> = {
     center: `translate(${centerX}px, ${centerY}px) scale(1)`,
-    cover: `translate(${centerX}px, ${centerY}px) scale(${coverScale})`,
+    cover: `translate(${heroX}px, ${heroY}px) scale(${HERO_SIZE / LOGO_SIZE})`,
     settle: `translate(${TARGET_X}px, ${TARGET_Y}px) scale(${TARGET_SIZE / LOGO_SIZE})`,
   };
   const durations: Record<Phase, string> = { center: "0ms", cover: "320ms", settle: "420ms" };
@@ -86,7 +91,7 @@ function LoginTransitionOverlay({ phase }: { phase: Phase }) {
           }`,
         }}
       >
-        <span style={{ opacity: phase === "center" ? 1 : 0, transition: "opacity 120ms" }}>JF</span>
+        <span>JF</span>
       </div>
     </div>
   );

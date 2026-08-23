@@ -3,10 +3,12 @@ import { useQuery } from "@tanstack/react-query";
 import * as analyticsApi from "@/api/analytics";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { MetricsGrid } from "@/features/dashboard/MetricsGrid";
-import { RecentActivityFeed } from "@/features/dashboard/RecentActivityFeed";
-import { StatCards } from "@/features/dashboard/StatCards";
-import { UpcomingPanel } from "@/features/dashboard/UpcomingPanel";
+import { DashboardHeader } from "@/features/dashboard/DashboardHeader";
+import { NextInterview } from "@/features/dashboard/NextInterview";
+import { PerformanceOverview } from "@/features/dashboard/PerformanceOverview";
+import { RecentActivity } from "@/features/dashboard/RecentActivity";
+import { SearchPipeline } from "@/features/dashboard/SearchPipeline";
+import { TasksSummary } from "@/features/dashboard/TasksSummary";
 
 export default function DashboardPage() {
   const { data, isLoading, isError, refetch } = useQuery({
@@ -29,15 +31,15 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-xl font-semibold text-text">Dashboard</h1>
-      <StatCards stats={data.stats} />
-      <MetricsGrid metrics={data.metrics} />
-      <UpcomingPanel upcoming={data.upcoming} />
-      <div>
-        <h2 className="mb-2 text-sm font-semibold text-text">Recent activity</h2>
-        <RecentActivityFeed activities={data.recent_activity} />
+    <div className="space-y-8">
+      <DashboardHeader upcoming={data.upcoming} />
+      <SearchPipeline stats={data.stats} />
+      <NextInterview interviews={data.upcoming.interviews} />
+      <div className="grid gap-8 sm:grid-cols-2">
+        <RecentActivity activities={data.recent_activity} />
+        <PerformanceOverview metrics={data.metrics} />
       </div>
+      <TasksSummary upcoming={data.upcoming} />
     </div>
   );
 }

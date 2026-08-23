@@ -62,7 +62,7 @@ export function Sidebar({ mobileOpen, onCloseMobile, collapsed, onToggleCollapse
             title={isCollapsed ? label : undefined}
             className={({ isActive }) =>
               cn(
-                "flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-colors",
+                "flex items-center gap-2 rounded-xl px-2.5 py-1.5 text-sm font-medium transition-colors",
                 isCollapsed && "justify-center px-0",
                 isActive ? "bg-accent/10 text-accent" : "text-muted hover:bg-surface-hover hover:text-text"
               )
@@ -80,7 +80,7 @@ export function Sidebar({ mobileOpen, onCloseMobile, collapsed, onToggleCollapse
               onClick={onToggleCollapsed}
               title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
               className={cn(
-                "flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-surface-hover hover:text-text",
+                "flex items-center gap-2 rounded-xl px-2.5 py-1.5 text-sm font-medium text-muted transition-colors hover:bg-surface-hover hover:text-text",
                 isCollapsed && "justify-center px-0"
               )}
             >
@@ -93,7 +93,7 @@ export function Sidebar({ mobileOpen, onCloseMobile, collapsed, onToggleCollapse
             onClick={handleLogout}
             title={isCollapsed ? "Log out" : undefined}
             className={cn(
-              "flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-danger/10 hover:text-danger",
+              "flex items-center gap-2 rounded-xl px-2.5 py-1.5 text-sm font-medium text-muted transition-colors hover:bg-danger/10 hover:text-danger",
               isCollapsed && "justify-center px-0"
             )}
           >
@@ -110,7 +110,7 @@ export function Sidebar({ mobileOpen, onCloseMobile, collapsed, onToggleCollapse
       <aside
         className={cn(
           "hidden shrink-0 border-r border-border bg-surface transition-[width] duration-200 md:flex",
-          collapsed ? "md:w-16" : "md:w-56 lg:w-60"
+          collapsed ? "md:w-16" : "md:w-52 lg:w-56"
         )}
       >
         {renderContent(collapsed, { showCollapseToggle: true })}
@@ -119,7 +119,7 @@ export function Sidebar({ mobileOpen, onCloseMobile, collapsed, onToggleCollapse
       {mobileOpen && (
         <div className="fixed inset-0 z-40 flex md:hidden">
           <div className="absolute inset-0 bg-black/40" onClick={onCloseMobile} />
-          <aside className="relative z-50 w-64 border-r border-border bg-surface shadow-xl">
+          <aside className="relative z-50 w-60 border-r border-border bg-surface shadow-xl">
             <button
               onClick={onCloseMobile}
               className="absolute right-3 top-3 rounded-lg p-1 text-muted hover:bg-surface-hover"

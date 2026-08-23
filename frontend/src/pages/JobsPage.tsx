@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "react-router-dom";
 
 import type { JobFilters } from "@/api/jobs";
 import * as pipelineApi from "@/api/pipeline";
@@ -19,9 +20,12 @@ type SortKey = NonNullable<JobFilters["sort"]>;
 const FILTER_LABELS: Record<BucketId, string> = { ...BUCKET_LABELS, rejected: "Rejection" };
 
 export default function JobsPage() {
+  const location = useLocation();
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebouncedValue(search, 300);
-  const [selectedBuckets, setSelectedBuckets] = useState<BucketId[]>([]);
+  const [selectedBuckets, setSelectedBuckets] = useState<BucketId[]>(
+    () => (location.state as { buckets?: BucketId[] } | null)?.buckets ?? []
+  );
   const [remoteStatus, setRemoteStatus] = useState("");
   const [minSalary, setMinSalary] = useState("");
   const [overdueOnly, setOverdueOnly] = useState(false);
