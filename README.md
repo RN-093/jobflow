@@ -6,7 +6,7 @@ A personal job-application CRM (ATS) with a drag-and-drop Kanban pipeline.
 
 Have a go: https://jobflow-two-phi.vercel.app
 
-Make your own account, it takes about ten seconds. There's no shared demo login, every account gets its own board.
+Make your own account, it takes about ten seconds.
 
 ## Stack
 
@@ -50,4 +50,4 @@ App runs at http://localhost:5173.
 
 Worth saying: the whole thing, backend, frontend, database schema, auth, the Kanban board, all of it, came together in about 50 minutes, from two prompts. Nothing was hand-fixed line by line afterwards. Two asks in, and out came a working app.
 
-Make of that what you will.
+
