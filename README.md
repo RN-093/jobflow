@@ -2,6 +2,12 @@
 
 A personal job-application CRM (ATS) with a drag-and-drop Kanban pipeline.
 
+## Live
+
+Have a go: https://jobflow-two-phi.vercel.app
+
+Make your own account, it takes about ten seconds. There's no shared demo login, every account gets its own board.
+
 ## Stack
 
 - Backend: FastAPI + SQLAlchemy 2.0 + PostgreSQL 16 + Alembic + JWT auth
@@ -40,4 +46,8 @@ npm run dev
 
 App runs at http://localhost:5173.
 
-Demo login (if seeded): `demo@jobflow.app` / `demo1234!`
+## Built fast
+
+Worth saying: the whole thing, backend, frontend, database schema, auth, the Kanban board, all of it, came together in about 50 minutes, from two prompts. Nothing was hand-fixed line by line afterwards. Two asks in, and out came a working app.
+
+Make of that what you will.
