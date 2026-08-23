@@ -1,6 +1,6 @@
 # JobFlow
 
-A personal job-application CRM (ATS) with a drag-and-drop Kanban pipeline.
+A personal job-application tracker. It's based on a similar thing from Jack & Jill but there one had a few issues so just made my own one. 
 
 ## Live
 
