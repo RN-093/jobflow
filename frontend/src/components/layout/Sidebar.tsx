@@ -62,7 +62,7 @@ export function Sidebar({ mobileOpen, onCloseMobile, collapsed, onToggleCollapse
             title={isCollapsed ? label : undefined}
             className={({ isActive }) =>
               cn(
-                "flex items-center gap-2 rounded-xl px-2.5 py-1.5 text-sm font-medium transition-colors",
+                "flex items-center gap-2 rounded-xl px-2.5 py-1 text-sm font-medium transition-colors",
                 isCollapsed && "justify-center px-0",
                 isActive ? "bg-accent/10 text-accent" : "text-muted hover:bg-surface-hover hover:text-text"
               )
@@ -80,7 +80,7 @@ export function Sidebar({ mobileOpen, onCloseMobile, collapsed, onToggleCollapse
               onClick={onToggleCollapsed}
               title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
               className={cn(
-                "flex items-center gap-2 rounded-xl px-2.5 py-1.5 text-sm font-medium text-muted transition-colors hover:bg-surface-hover hover:text-text",
+                "flex items-center gap-2 rounded-xl px-2.5 py-1 text-sm font-medium text-muted transition-colors hover:bg-surface-hover hover:text-text",
                 isCollapsed && "justify-center px-0"
               )}
             >
@@ -93,7 +93,7 @@ export function Sidebar({ mobileOpen, onCloseMobile, collapsed, onToggleCollapse
             onClick={handleLogout}
             title={isCollapsed ? "Log out" : undefined}
             className={cn(
-              "flex items-center gap-2 rounded-xl px-2.5 py-1.5 text-sm font-medium text-muted transition-colors hover:bg-danger/10 hover:text-danger",
+              "flex items-center gap-2 rounded-xl px-2.5 py-1 text-sm font-medium text-muted transition-colors hover:bg-danger/10 hover:text-danger",
               isCollapsed && "justify-center px-0"
             )}
           >
